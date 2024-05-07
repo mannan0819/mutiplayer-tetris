@@ -1,0 +1,41 @@
+
+.square {
+  width: 30px;
+  height: 30px;
+  aspect-ratio: 1/1;
+  border: 1px solid #000;
+  background-color: #fff;
+}
+
+.board-row {
+  display: flex;
+  flex-direction: row;
+} 
+
+.L {
+  background-color: #FF0000;
+}
+
+.J {
+  background-color: #0000FF;
+}
+
+.S {
+  background-color: #00FF00;
+}
+
+.Z {
+  background-color: #FF00FF;
+}
+
+.T {
+  background-color: #FFA500;
+}
+
+.I {
+  background-color: #00FFFF;
+}
+
+.O {
+  background-color: #FFFF00;
+}
