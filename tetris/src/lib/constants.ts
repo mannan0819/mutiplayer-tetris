@@ -17,6 +17,7 @@ export const BLOCKS = {
     [BlockType.I]: {
         shape: [
             [1, 1, 1, 1],
+            [0, 0, 0, 0]
         ],
         color: 'cyan',
     },

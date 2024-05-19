@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BoardType } from '../lib/constants';
 import Sqaure from './Square';
 
@@ -6,6 +7,9 @@ interface BoardProps {
 }
 
 export default function Board({ board }: BoardProps) {
+  useEffect(() => {
+    console.log('board GETTING CHANGED', board);
+  }, [board]);
   return (
     <div className="board">
       {board.map((row, rowIndex) => (
