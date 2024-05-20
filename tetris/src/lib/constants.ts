@@ -13,7 +13,12 @@ export enum EmptyCellType {
 export type CellType = BlockType | EmptyCellType;
 export type BoardType = CellType[][];
 
-export const BLOCKS = {
+export const BLOCKS: Record<CellType, { shape: number[][], color: string }>
+ = {
+    [EmptyCellType.EMPTY]:{
+        shape: [],
+        color: 'white',
+    },
     [BlockType.I]: {
         shape: [
             [1, 1, 1, 1],

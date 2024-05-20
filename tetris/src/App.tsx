@@ -7,10 +7,11 @@ import {
   BOARD_ROWS,
   BlockType,
   BoardType,
+  CellType,
   EmptyCellType,
 } from './lib/constants';
 
-const tickSpeed = 1000;
+const tickSpeed = 300;
 
 const newArray = (rows: number, cols: number) => {
   return Array.from({ length: rows }, () =>
@@ -18,15 +19,35 @@ const newArray = (rows: number, cols: number) => {
   );
 };
 
+const hasCollision = (
+  board: BoardType, 
+  row: number, col: number, 
+  cellType: CellType) => {
+    const shape = BLOCKS[cellType].shape;
+    const lastRowOfShape = shape[shape.length - 1];
+    return lastRowOfShape.some(
+      (cell, i) => col && board[row + 1][col + i] !== EmptyCellType.EMPTY
+    );
+};
+
+const hasLastRowCollision = (row: number, cellType: CellType) => {
+  const shape = BLOCKS[cellType].shape;
+  const lastRowOfShape = shape[shape.length - 1];
+  return lastRowOfShape.some(cell => cell && row + 1 < BOARD_ROWS);
+}
+
+
+
 const calculateNewBoard = (myBoard: BoardType) => {
   const newBoard = myBoard.map((row) => row.slice()); // Create a deep copy of the board
   for (let row = BOARD_ROWS - 1; row >= 0; row--) {
     for (let col = 0; col < BOARD_COLS; col++) {
       if (
         newBoard[row][col] !== EmptyCellType.EMPTY &&
-        row !== BOARD_ROWS - 1
+        hasLastRowCollision(row, newBoard[row][col])  &&
+        !hasCollision(newBoard, row, col, newBoard[row][col]) &&
+        newBoard[row + 1][col] === EmptyCellType.EMPTY
       ) {
-        console.log('setting new block', row, col);
         newBoard[row + 1][col] = newBoard[row][col];
         newBoard[row][col] = EmptyCellType.EMPTY;
       }
@@ -62,9 +83,15 @@ function App() {
   const tick = () => {
     console.log('tick');
     console.log(myBoardState);
+    setMyBoard((prevBoard) => {
+      // Calculate the new board state based on prevBoard
+      const newBoard = calculateNewBoard(prevBoard);
+      return newBoard;
+    });
   };
 
   useEffect(() => {
+    console.log('use Effect called')
     const handleKeyDown = (event: KeyboardEvent) => {
       console.log(event.key);
     };
@@ -72,21 +99,12 @@ function App() {
     window.addEventListener('keydown', handleKeyDown);
     setInterval(() => {
       tick();
-      setMyBoard((prevBoard) => {
-        // Calculate the new board state based on prevBoard
-        const newBoard = calculateNewBoard(prevBoard);
-        return newBoard;
-      });
     }, tickSpeed);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
-  useEffect(() => {
-    console.log('myBoardState changed -----------------------');
-  }, [myBoardState]);
 
   return (
     <>
