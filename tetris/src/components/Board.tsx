@@ -7,9 +7,9 @@ interface BoardProps {
 }
 
 export default function Board({ board }: BoardProps) {
-  useEffect(() => {
-    console.log('board GETTING CHANGED', board);
-  }, [board]);
+  // useEffect(() => {
+  //   // console.log('board GETTING CHANGED', board);
+  // }, [board]);
   return (
     <div className="board">
       {board.map((row, rowIndex) => (

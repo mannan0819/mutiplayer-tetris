@@ -7,64 +7,86 @@ export enum BlockType {
     T = 'T',
     Z = 'Z',
 }
+
+export type Block = {
+    type: BlockType,
+    currentShape: number[][],
+    currentPosition?: { x: number, y: number }[] | undefined,
+}
+
 export enum EmptyCellType {
     EMPTY = 'EMPTY',
 }
 export type CellType = BlockType | EmptyCellType;
 export type BoardType = CellType[][];
 
-export const BLOCKS: Record<CellType, { shape: number[][], color: string }>
- = {
-    [EmptyCellType.EMPTY]:{
-        shape: [],
+export const BLOCKS: Record<CellType, { shapes: number[][][], color: string }>
+    = {
+    [EmptyCellType.EMPTY]: {
+        shapes: [],
         color: 'white',
     },
     [BlockType.I]: {
-        shape: [
-            [1, 1, 1, 1],
-            [0, 0, 0, 0]
+        shapes: [
+            [
+                [1, 1, 1, 1]
+            ],
+            [
+                [1],
+                [1],
+                [1],
+                [1]
+            ]
         ],
         color: 'cyan',
     },
     [BlockType.J]: {
-        shape: [
-            [1, 1, 1],
-            [0, 0, 1],
-        ],
+        shapes:
+            [[
+                [1, 1, 1],
+                [0, 0, 1],
+            ]],
         color: 'blue',
     },
     [BlockType.L]: {
-        shape: [
-            [1, 1, 1],
-            [1, 0, 0],
-        ],
+        shapes:
+            [[
+                [1, 1, 1],
+                [1, 0, 0],
+            ]],
         color: 'orange',
     },
     [BlockType.O]: {
-        shape: [
+        shapes: [[
             [1, 1],
             [1, 1],
-        ],
+        ]],
         color: 'yellow',
     },
     [BlockType.S]: {
-        shape: [
-            [0, 1, 1],
-            [1, 1, 0],
+        shapes: [
+            [
+                [0, 1, 1],
+                [1, 1, 0],
+            ]
         ],
         color: 'green',
     },
     [BlockType.T]: {
-        shape: [
-            [1, 1, 1],
-            [0, 1, 0],
+        shapes: [
+            [
+                [1, 1, 1],
+                [0, 1, 0],
+            ]
         ],
         color: 'purple',
     },
     [BlockType.Z]: {
-        shape: [
-            [1, 1, 0],
-            [0, 1, 1],
+        shapes: [
+            [
+                [1, 1, 0],
+                [0, 1, 1],
+            ]
         ],
         color: 'red',
     },

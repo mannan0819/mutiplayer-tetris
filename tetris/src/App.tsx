@@ -5,11 +5,14 @@ import {
   BLOCKS,
   BOARD_COLS,
   BOARD_ROWS,
+  Block,
   BlockType,
   BoardType,
   CellType,
   EmptyCellType,
 } from './lib/constants';
+import { rotate } from './utils/rotate';
+import { moveActiveBlock } from './utils/moveActiveBlock';
 
 const tickSpeed = 300;
 
@@ -19,83 +22,74 @@ const newArray = (rows: number, cols: number) => {
   );
 };
 
-const hasCollision = (
-  board: BoardType, 
-  row: number, col: number, 
-  cellType: CellType) => {
-    const shape = BLOCKS[cellType].shape;
-    const lastRowOfShape = shape[shape.length - 1];
-    return lastRowOfShape.some(
-      (cell, i) => col && board[row + 1][col + i] !== EmptyCellType.EMPTY
-    );
-};
-
-const hasLastRowCollision = (row: number, cellType: CellType) => {
-  const shape = BLOCKS[cellType].shape;
-  const lastRowOfShape = shape[shape.length - 1];
-  return lastRowOfShape.some(cell => cell && row + 1 < BOARD_ROWS);
-}
-
-
-
-const calculateNewBoard = (myBoard: BoardType) => {
-  const newBoard = myBoard.map((row) => row.slice()); // Create a deep copy of the board
-  for (let row = BOARD_ROWS - 1; row >= 0; row--) {
-    for (let col = 0; col < BOARD_COLS; col++) {
-      if (
-        newBoard[row][col] !== EmptyCellType.EMPTY &&
-        hasLastRowCollision(row, newBoard[row][col])  &&
-        !hasCollision(newBoard, row, col, newBoard[row][col]) &&
-        newBoard[row + 1][col] === EmptyCellType.EMPTY
-      ) {
-        newBoard[row + 1][col] = newBoard[row][col];
-        newBoard[row][col] = EmptyCellType.EMPTY;
-      }
-    }
-  }
-  return newBoard;
-};
-
 const board = newArray(BOARD_ROWS, BOARD_COLS);
 
-const getRandomBlock = () => {
-  const blocks = Object.keys(BLOCKS);
-  return blocks[Math.floor(Math.random() * blocks.length)] as BlockType;
+const getRandomBlock = (): Block => {
+  const shape = 'I' as BlockType;
+  return {
+    type: shape,
+    currentShape: BLOCKS.I.shapes[0],
+  };
 };
 
-const addNewBlock = (board: BoardType) => {
-  const block: BlockType = getRandomBlock();
-  const shape = BLOCKS[block].shape;
+const addNewBlock = (
+  block: Block | null,
+  setActiveBlock: React.Dispatch<React.SetStateAction<Block | null>>,
+  board: BoardType,
+  setBoard: React.Dispatch<React.SetStateAction<BoardType>>
+) => {
+  if (!block) return null;
+  const myBoard = board.map((row) => row.slice());
+  const shape = BLOCKS[block.type].shapes[0];
+  const currentPosition = [];
   for (let row = 0; row < shape.length; row++) {
     for (let col = 0; col < shape[row].length; col++) {
       if (shape[row][col]) {
-        board[row][col] = block;
+        console.log('row: ', row, ' col: ', col);
+        myBoard[row][col] = block.type;
+        currentPosition.push({
+          x: row,
+          y: col,
+        });
       }
     }
   }
+
+  console.log('curre position: ', currentPosition);
+  setActiveBlock({
+    ...block,
+    currentPosition,
+  });
+  console.log('BLOCK HAS BEEN ADDED: ', block);
+  setBoard(myBoard);
 };
-addNewBlock(board);
 
 function App() {
   const [myBoardState, setMyBoard] = useState<BoardType>(board);
-  // newArray(BOARD_ROWS, BOARD_COLS);
+  const [activeBlock, setActiveBlock] = useState<null | Block>(null);
+
+  useEffect(() => {
+    if (!activeBlock) {
+      console.log('ADDING NEW BLOCK');
+      const newBlockToADd = getRandomBlock();
+      console.log(newBlockToADd);
+      addNewBlock(activeBlock, setActiveBlock, board, setMyBoard);
+      setActiveBlock(newBlockToADd);
+    }
+  }, [activeBlock]);
 
   const tick = () => {
     console.log('tick');
-    console.log(myBoardState);
-    setMyBoard((prevBoard) => {
-      // Calculate the new board state based on prevBoard
-      const newBoard = calculateNewBoard(prevBoard);
-      return newBoard;
-    });
+    moveActiveBlock(myBoardState, setMyBoard, activeBlock, setActiveBlock);
   };
 
   useEffect(() => {
-    console.log('use Effect called')
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowRight') {
+        rotate(activeBlock, myBoardState, setMyBoard);
+      }
       console.log(event.key);
     };
-
     window.addEventListener('keydown', handleKeyDown);
     setInterval(() => {
       tick();
